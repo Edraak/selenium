@@ -641,7 +641,7 @@ module Selenium
             raise ArgumentError, "#{opts.inspect} invalid for #{command.inspect}"
           end
 
-          puts "-> #{verb.to_s.upcase} #{path}" if $DEBUG
+          WebDriver.logger.debug("-> #{verb.to_s.upcase} #{path}")
           http.call verb, path, command_hash
         end
 

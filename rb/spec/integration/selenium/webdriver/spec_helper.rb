@@ -36,7 +36,10 @@ end
 RSpec.configure do |c|
   c.include(WebDriver::SpecSupport::Helpers)
   c.before(:suite) do
-    $DEBUG ||= ENV['DEBUG'] == 'true'
+    if ENV['DEBUG'] == 'true'
+      WebDriver::Logger.io = STDOUT
+      WebDriver::Logger.level = Logger::DEBUG
+    end
     GlobalTestEnv.remote_server.start if GlobalTestEnv.driver == :remote
   end
 
@@ -49,6 +52,6 @@ end
 
 WebDriver::Platform.exit_hook { GlobalTestEnv.quit }
 
-$stdout.sync = true
+STDOUT.sync = true
 GlobalTestEnv.unguarded = ENV['noguards'] == 'true'
 WebDriver::SpecSupport::Guards.print_env

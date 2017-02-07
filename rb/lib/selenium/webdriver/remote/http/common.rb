@@ -52,8 +52,8 @@ module Selenium
               headers['Content-Length'] = payload.bytesize.to_s if [:post, :put].include?(verb)
 
               if $DEBUG
-                puts "   >>> #{url} | #{payload}"
-                puts "     > #{headers.inspect}"
+                WebDriver.logger.debug("   >>> #{url} | #{payload}")
+                WebDriver.logger.debug("     > #{headers.inspect}")
               end
             elsif verb == :post
               payload = '{}'
@@ -78,7 +78,7 @@ module Selenium
             code = code.to_i
             body = body.to_s.strip
             content_type = content_type.to_s
-            puts "<- #{body}\n" if $DEBUG
+            WebDriver.logger.debug("<- #{body}\n")
 
             if content_type.include? CONTENT_TYPE
               raise Error::WebDriverError, "empty body: #{content_type.inspect} (#{code})\n#{body}" if body.empty?

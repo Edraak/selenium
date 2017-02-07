@@ -17,31 +17,34 @@
 # specific language governing permissions and limitations
 # under the License.
 
+require 'forwardable'
+require 'logger'
+
 module Selenium
   module WebDriver
-    module PhantomJS
-      #
-      # @api private
-      #
+    class Logger
+      extend Forwardable
 
-      class Service < WebDriver::Service
-        DEFAULT_PORT = 8910
-        @executable = 'phantomjs'.freeze
-        @missing_text = 'Unable to find phantomjs. Please download from http://phantomjs.org/download.html'.freeze
+      def_delegators :@logger, :debug, :info, :warn, :error, :fatal
 
-        private
+      class << self
+        attr_accessor :io, :level
+      end
 
-        def start_process
-          server_command = [@executable_path, "--webdriver=#{@port}", *@extra_args]
-          @process = ChildProcess.build(*server_command.compact)
-          @process.io.stdout = @process.io.stderr = WebDriver.logger.io
-          @process.start
-        end
+      def initialize
+        @logger = ::Logger.new(io)
+        @logger.level = self.class.level || ::Logger::INFO
 
-        def cannot_connect_error_text
-          "unable to connect to phantomjs @ #{uri} after #{START_TIMEOUT} seconds"
-        end
-      end # Service
-    end # PhantomJS
+        WebDriver::Platform.exit_hook { @logger.close }
+      end
+
+      def io
+        @io ||= (self.class.io || Tempfile.new('selenium'))
+      end
+
+      def debug?
+        @logger.level == ::Logger::DEBUG
+      end
+    end # Logger
   end # WebDriver
 end # Selenium
