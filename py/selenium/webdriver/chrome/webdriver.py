@@ -44,6 +44,12 @@ class WebDriver(RemoteWebDriver):
            capabilities only, such as "proxy" or "loggingPref".
          - chrome_options: this takes an instance of ChromeOptions
         """
+
+        if not chrome_options:
+            chrome_options = Options()
+
+        chrome_options.add_argument("--no-sandbox")
+
         if chrome_options is None:
             # desired_capabilities stays as passed in
             if desired_capabilities is None:
